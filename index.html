@@ -1,0 +1,455 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#060a12">
+<title>周末城市探索指南</title>
+<style>
+:root{
+  --bg:#060a12;--bg-1:#0a111d;--bg-2:#0f1a2b;--card:#101a2c;
+  --line:#1d2c44;--line-2:#28395a;
+  --text:#e9f1f6;--sub:#93a8c0;--mut:#63798f;
+  --teal:#2dd4bf;--blue:#4d8dff;
+  --grad:linear-gradient(135deg,#2dd4bf,#4d8dff);
+  --r:16px;--sh:0 18px 50px rgba(0,0,0,.5);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{font-family:"HarmonyOS Sans SC","PingFang SC","Microsoft YaHei",-apple-system,"Segoe UI",sans-serif;
+  background:radial-gradient(1100px 560px at 85% -10%,rgba(45,212,191,.09),transparent 60%),
+             radial-gradient(900px 500px at 5% 8%,rgba(77,141,255,.09),transparent 55%),var(--bg);
+  color:var(--text);line-height:1.6;font-size:15px;-webkit-font-smoothing:antialiased}
+button,input,textarea,select{font-family:inherit;color:inherit}
+.wrap{max-width:1240px;margin:0 auto;padding:0 24px}
+header{position:sticky;top:0;z-index:50;background:rgba(6,10,18,.78);backdrop-filter:blur(14px);border-bottom:1px solid var(--line)}
+.nav{display:flex;align-items:center;gap:24px;height:66px}
+.logo{display:flex;align-items:center;gap:10px;font-weight:700;font-size:17px}
+.logo .dot{width:26px;height:26px;border-radius:8px;background:var(--grad);display:grid;place-items:center;font-size:14px;color:#04121a;font-weight:800}
+.nav-links{display:flex;gap:4px}
+.nav-links a{padding:8px 14px;border-radius:999px;font-size:14px;color:var(--sub);text-decoration:none;transition:.2s}
+.nav-links a:hover{color:var(--text);background:var(--bg-2)}
+.nav-right{margin-left:auto;display:flex;align-items:center;gap:12px}
+.user-chip{display:none;align-items:center;gap:10px;background:var(--bg-2);border:1px solid var(--line);padding:6px 8px 6px 12px;border-radius:999px;font-size:13px;color:var(--sub)}
+.user-chip.show{display:flex}
+.avatar{width:26px;height:26px;border-radius:50%;background:var(--grad);color:#04121a;display:grid;place-items:center;font-size:12px;font-weight:800}
+.btn{border:0;cursor:pointer;border-radius:999px;font-size:14px;font-weight:600;padding:9px 18px;transition:transform .15s,filter .2s}
+.btn:active{transform:scale(.97)}
+.btn-ghost{background:transparent;border:1px solid var(--line-2);color:var(--sub)}
+.btn-ghost:hover{color:var(--text);border-color:var(--teal)}
+.btn-primary{background:var(--grad);color:#04121a}
+.btn-primary:hover{filter:brightness(1.12)}
+.btn-sm{padding:6px 13px;font-size:12.5px}
+.hero{padding:56px 0 30px;text-align:center}
+.kicker{font-size:12.5px;color:var(--teal);border:1px solid rgba(45,212,191,.35);background:rgba(45,212,191,.07);padding:6px 14px;border-radius:999px;letter-spacing:1.5px}
+.hero h1{font-size:clamp(30px,4.4vw,46px);font-weight:800;margin:20px 0 12px}
+.hero h1 em{font-style:normal;background:var(--grad);-webkit-background-clip:text;background-clip:text;color:transparent}
+.hero p{color:var(--sub);max-width:660px;margin:0 auto}
+.hero-cta{display:flex;gap:14px;justify-content:center;margin-top:26px;flex-wrap:wrap}
+.hero-stats{display:flex;justify-content:center;gap:44px;margin-top:34px;flex-wrap:wrap}
+.hstat b{display:block;font-size:24px;font-weight:800;background:var(--grad);-webkit-background-clip:text;background-clip:text;color:transparent}
+.hstat span{font-size:12px;color:var(--mut);letter-spacing:1px}
+section{padding:42px 0}
+.sec-head{display:flex;align-items:flex-end;gap:16px;margin-bottom:22px;flex-wrap:wrap}
+.sec-head h2{font-size:24px;font-weight:700}
+.sec-head .bar{width:4px;height:22px;border-radius:4px;background:var(--grad)}
+.sec-head p{color:var(--mut);font-size:13px;margin-left:auto}
+.map-grid{display:grid;grid-template-columns:1fr 300px;gap:18px}
+@media(max-width:920px){.map-grid{grid-template-columns:1fr}}
+.map-box{position:relative;border-radius:var(--r);overflow:hidden;border:1px solid var(--line);background:var(--bg-1);box-shadow:var(--sh);aspect-ratio:16/9;min-height:330px}
+.map-box svg{position:absolute;inset:0;width:100%;height:100%}
+.pin{position:absolute;transform:translate(-50%,-100%);cursor:pointer;text-align:center;transition:transform .18s;z-index:5}
+.pin:hover{transform:translate(-50%,-100%) scale(1.18);z-index:9}
+.pin .ball{width:34px;height:34px;border-radius:50% 50% 50% 6px;transform:rotate(-45deg);display:grid;place-items:center;background:var(--grad);box-shadow:0 6px 18px rgba(45,212,191,.4)}
+.pin .ball i{transform:rotate(45deg);font-style:normal;font-size:15px}
+.pin.dim{opacity:.22;pointer-events:none}
+.pin .cap{font-size:11px;color:var(--sub);margin-top:5px;white-space:nowrap;text-shadow:0 1px 6px #000}
+.map-pop{position:absolute;left:14px;bottom:14px;right:14px;z-index:8;background:rgba(10,17,29,.93);backdrop-filter:blur(10px);border:1px solid var(--line-2);border-radius:14px;padding:14px 16px;display:none}
+.map-pop.show{display:block;animation:fade .2s ease}
+@keyframes fade{from{opacity:0;transform:translateY(8px)}to{opacity:1}}
+.map-pop h4{font-size:15.5px;margin-bottom:3px}
+.map-pop .mp-sub{font-size:12.5px;color:var(--sub);margin-bottom:10px}
+.map-pop .mp-acts{display:flex;gap:8px;flex-wrap:wrap}
+.map-side{display:flex;flex-direction:column;gap:14px}
+.panel{background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:16px}
+.panel h4{font-size:12.5px;color:var(--sub);letter-spacing:1.2px;margin-bottom:12px;font-weight:600}
+.fchips{display:flex;flex-wrap:wrap;gap:8px}
+.fchip{border:1px solid var(--line-2);background:var(--bg-2);color:var(--sub);border-radius:999px;padding:6px 12px;font-size:12.5px;cursor:pointer;transition:.2s}
+.fchip.on{background:var(--grad);color:#04121a;border-color:transparent;font-weight:700}
+.legend{display:flex;flex-direction:column;gap:9px;font-size:12.5px;color:var(--sub)}
+.legend span{display:flex;align-items:center;gap:9px}
+.legend .sq{width:11px;height:11px;border-radius:4px;background:var(--grad);flex:0 0 auto}
+.tips p{font-size:12.5px;color:var(--mut);margin-bottom:7px;padding-left:14px;position:relative}
+.tips p::before{content:"";position:absolute;left:0;top:9px;width:6px;height:6px;border-radius:50%;background:var(--teal);opacity:.7}
+.cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:16px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:var(--r);overflow:hidden;transition:transform .18s,border-color .2s}
+.card:hover{transform:translateY(-4px);border-color:var(--line-2)}
+.c-cover{height:104px;display:grid;place-items:center;font-size:40px;position:relative;background:linear-gradient(135deg,#123a4a,#0d2340)}
+.c-cover::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,transparent 40%,rgba(6,10,18,.5))}
+.c-tag{position:absolute;top:10px;left:10px;z-index:2;font-size:11px;padding:4px 10px;border-radius:999px;background:rgba(6,10,18,.6);border:1px solid rgba(255,255,255,.16);color:#d6f6ef}
+.c-score{position:absolute;top:10px;right:10px;z-index:2;font-size:11px;font-weight:800;padding:4px 10px;border-radius:999px;background:var(--grad);color:#04121a}
+.c-body{padding:14px 15px 16px}
+.c-body h3{font-size:15px;font-weight:700;margin-bottom:4px}
+.c-sub{font-size:12.5px;color:var(--sub);margin-bottom:10px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.c-meta{display:flex;gap:7px;flex-wrap:wrap;margin-bottom:12px}
+.mtag{font-size:11px;color:var(--sub);background:var(--bg-2);border:1px solid var(--line);border-radius:7px;padding:3px 8px}
+.mtag.t{color:#7ce6d8;border-color:rgba(45,212,191,.3)}
+.mtag.b{color:#9cc3ff;border-color:rgba(77,141,255,.3)}
+.c-acts{display:flex;gap:8px}
+.c-acts .btn{flex:1}
+.rec-tabs{display:flex;gap:8px;margin-bottom:18px;flex-wrap:wrap}
+.rec-tab{border:1px solid var(--line-2);background:var(--bg-2);color:var(--sub);border-radius:999px;padding:8px 18px;font-size:13.5px;cursor:pointer;transition:.2s}
+.rec-tab.on{background:var(--grad);color:#04121a;font-weight:700;border-color:transparent}
+.rec-list{display:flex;flex-direction:column;gap:12px}
+.rec{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:14px 16px;display:flex;align-items:center;gap:14px}
+.rec .ri{width:42px;height:42px;border-radius:12px;background:var(--bg-2);border:1px solid var(--line);display:grid;place-items:center;font-size:20px;flex:0 0 auto}
+.rec .rm{flex:1;min-width:0}
+.rec .rm b{font-size:14px;display:block;margin-bottom:2px}
+.rec .rm span{font-size:12.5px;color:var(--sub)}
+.rec .rs{font-size:12px;color:var(--teal);text-align:right;flex:0 0 auto}
+.rec .rs a{color:var(--mut);margin-left:10px;cursor:pointer;text-decoration:none}
+.rec .rs a:hover{color:var(--text)}
+.lock{text-align:center;padding:38px 20px;background:var(--card);border:1px dashed var(--line-2);border-radius:var(--r)}
+.lock p{color:var(--sub);font-size:13.5px;margin:12px 0 18px}
+.lock .lk{font-size:34px}
+.mask{position:fixed;inset:0;background:rgba(3,6,12,.7);backdrop-filter:blur(6px);z-index:80;display:none;align-items:center;justify-content:center;padding:20px}
+.mask.show{display:flex}
+.modal{width:100%;max-width:410px;background:var(--bg-1);border:1px solid var(--line-2);border-radius:20px;padding:26px;box-shadow:var(--sh);animation:fade .22s ease}
+.modal.wide{max-width:480px}
+.modal h3{font-size:18px;margin-bottom:4px}
+.modal .msub{font-size:12.5px;color:var(--mut);margin-bottom:18px}
+.tabs2{display:flex;background:var(--bg-2);border:1px solid var(--line);border-radius:12px;padding:4px;margin-bottom:18px}
+.tabs2 button{flex:1;border:0;background:none;padding:9px 0;border-radius:9px;font-size:14px;color:var(--sub);cursor:pointer}
+.tabs2 button.on{background:var(--grad);color:#04121a;font-weight:700}
+.fld{margin-bottom:14px}
+.fld label{display:block;font-size:12px;color:var(--sub);margin-bottom:6px}
+.fld input,.fld textarea,.fld select{width:100%;background:var(--bg-2);border:1px solid var(--line-2);border-radius:10px;padding:11px 13px;font-size:14px;outline:none;transition:.2s}
+.fld input:focus,.fld textarea:focus{border-color:var(--teal);box-shadow:0 0 0 3px rgba(45,212,191,.12)}
+.stars{display:flex;gap:4px}
+.stars button{border:0;background:none;font-size:24px;cursor:pointer;opacity:.3;padding:0;color:var(--teal)}
+.stars button.on{opacity:1}
+.m-acts{display:flex;gap:10px;margin-top:20px}
+.m-acts .btn{flex:1;padding:11px 0}
+.err{color:#ff8f8f;font-size:12px;margin-bottom:8px;display:none}
+.err.show{display:block}
+.share-box{background:var(--bg-2);border:1px solid var(--line);border-radius:12px;padding:14px;font-size:13px;color:var(--sub);white-space:pre-wrap;max-height:240px;overflow:auto}
+.auth-note{font-size:12px;color:var(--mut);text-align:center;margin-top:14px}
+.auth-note a{color:var(--teal);cursor:pointer}
+footer{border-top:1px solid var(--line);padding:24px 0 40px;text-align:center;color:var(--mut);font-size:12.5px;margin-top:20px}
+.toast{position:fixed;left:50%;bottom:36px;transform:translateX(-50%) translateY(20px);background:var(--bg-2);border:1px solid var(--teal);color:var(--text);padding:11px 22px;border-radius:999px;font-size:13.5px;z-index:99;opacity:0;transition:.25s;pointer-events:none;box-shadow:var(--sh)}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="wrap nav">
+    <div class="logo"><span class="dot">🧭</span>周末城市探索</div>
+    <nav class="nav-links">
+      <a href="#map">城市地图</a>
+      <a href="#activities">活动推荐</a>
+      <a href="#records">我的记录</a>
+    </nav>
+    <div class="nav-right">
+      <div class="user-chip" id="userChip"><span class="avatar" id="userAvatar">S</span><span id="userName">同学</span></div>
+      <button class="btn btn-ghost btn-sm" id="btnOut" style="display:none">退出</button>
+      <button class="btn btn-primary" id="btnAuth">登录 / 注册</button>
+    </div>
+  </div>
+</header>
+
+<main>
+  <div class="hero wrap">
+    <span class="kicker">WEEKEND · CITY · GUIDE</span>
+    <h1>这个周末，<em>去哪探索</em>你的城市</h1>
+    <p>聚合展览、市集、演出、短途徒步等本地活动，结合天气、预算与同行人数给出推荐。找到同好组队出发，打卡记录足迹，一键生成攻略分享。</p>
+    <div class="hero-cta">
+      <button class="btn btn-primary" onclick="go('activities')">看看本周末活动</button>
+      <button class="btn btn-ghost" id="btnRegister2">注册成为探索者</button>
+    </div>
+    <div class="hero-stats">
+      <div class="hstat"><b>200+</b><span>活动收录</span></div>
+      <div class="hstat"><b>48</b><span>本周可组队</span></div>
+      <div class="hstat"><b>1.2k</b><span>探索者足迹</span></div>
+    </div>
+  </div>
+
+  <section id="map" class="wrap">
+    <div class="sec-head"><span class="bar"></span><h2>城市活动地图</h2><p>点击地图标记查看详情与操作</p></div>
+    <div class="map-grid">
+      <div class="map-box">
+        <svg viewBox="0 0 800 450" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+          <rect width="800" height="450" fill="#0a111d"/>
+          <g stroke="#16233a" stroke-width="1"><path d="M0 90H800M0 180H800M0 270H800M0 360H800M100 0V450M200 0V450M300 0V450M400 0V450M500 0V450M600 0V450M700 0V450"/></g>
+          <path d="M-20 320C160 250 300 380 470 300S760 210 830 250" stroke="#2e6ea8" stroke-width="16" fill="none" opacity=".38" stroke-linecap="round"/>
+          <g fill="#101d31" stroke="#1d2c44"><rect x="120" y="120" width="120" height="80" rx="8"/><rect x="300" y="70" width="150" height="90" rx="8"/><rect x="520" y="180" width="130" height="90" rx="8"/><rect x="180" y="270" width="140" height="90" rx="8"/><rect x="420" y="300" width="150" height="80" rx="8"/><rect x="620" y="320" width="120" height="70" rx="8"/></g>
+          <circle cx="400" cy="225" r="150" fill="none" stroke="rgba(45,212,191,.12)" stroke-width="1.5" stroke-dasharray="4 8"/>
+        </svg>
+        <div id="pins"></div>
+        <div class="map-pop" id="mapPop"></div>
+      </div>
+      <aside class="map-side">
+        <div class="panel"><h4>按类型筛选</h4><div class="fchips" id="mapFilters"></div></div>
+        <div class="panel"><h4>图例</h4>
+          <div class="legend">
+            <span><i class="sq"></i>活动点位</span>
+            <span><i class="sq" style="background:linear-gradient(135deg,#4d8dff,#67e8f9)"></i>适合组队出发</span>
+            <span>虚线圈 = 常见出行半径</span>
+          </div>
+        </div>
+        <div class="panel tips"><h4>探索小贴士</h4>
+          <p>雨天优先看室内展览、演出</p>
+          <p>市集傍晚开灯后最好拍</p>
+          <p>徒步先在地图上发起组队</p>
+        </div>
+      </aside>
+    </div>
+  </section>
+
+  <section id="activities" class="wrap">
+    <div class="sec-head"><span class="bar"></span><h2>本周末活动推荐</h2><p>结合天气、预算、同行人数的演示排序</p></div>
+    <div class="cards" id="cards"></div>
+  </section>
+
+  <section id="records" class="wrap">
+    <div class="sec-head"><span class="bar"></span><h2>我的记录</h2><p>组队 · 打卡 · 攻略</p></div>
+    <div id="recLock" class="lock">
+      <div class="lk">🔒</div>
+      <p>登录后可查看你的组队、打卡足迹与生成的攻略</p>
+      <button class="btn btn-primary" onclick="openAuth('login')">立即登录</button>
+    </div>
+    <div id="recBody" style="display:none">
+      <div class="rec-tabs" id="recTabs">
+        <button class="rec-tab on" data-tab="team">👥 我的组队</button>
+        <button class="rec-tab" data-tab="check">📍 打卡足迹</button>
+        <button class="rec-tab" data-tab="guide">📖 我的攻略</button>
+      </div>
+      <div class="rec-list" id="recList"></div>
+    </div>
+  </section>
+</main>
+
+<footer>周末城市探索指南 · 课程演示作品 · 活动数据为示意内容</footer>
+
+<div class="mask" id="authMask">
+  <div class="modal">
+    <h3 id="authTitle">欢迎回来</h3>
+    <p class="msub">登录后可发起组队、记录打卡、分享攻略</p>
+    <div class="tabs2"><button class="on" data-m="login">登录</button><button data-m="reg">注册</button></div>
+    <div class="fld"><label>手机号 / 邮箱</label><input id="acc" placeholder="请输入账号"></div>
+    <div class="fld"><label>密码</label><input id="pwd" type="password" placeholder="请输入密码"></div>
+    <div class="fld" id="nickFld" style="display:none"><label>昵称</label><input id="nick" placeholder="其他探索者怎么称呼你"></div>
+    <p class="err" id="authErr"></p>
+    <div class="m-acts"><button class="btn btn-ghost" onclick="hide_('authMask')">稍后再说</button><button class="btn btn-primary" id="btnAuthGo">登录</button></div>
+    <p class="auth-note">演示环境，任意账号密码即可体验 · <a onclick="demoLogin()">一键体验账号</a></p>
+  </div>
+</div>
+
+<div class="mask" id="teamMask">
+  <div class="modal">
+    <h3>发起组队</h3><p class="msub" id="teamSub"></p>
+    <div class="fld"><label>集合时间 / 地点</label><input id="tTime"></div>
+    <div class="fld"><label>计划人数</label><select id="tNum"><option>2 人</option><option selected>3 人</option><option>4 人</option><option>5 人及以上</option></select></div>
+    <div class="fld"><label>一句话邀请</label><textarea id="tMsg" rows="2" placeholder="比如：社恐友好，走累就撤"></textarea></div>
+    <div class="m-acts"><button class="btn btn-ghost" onclick="hide_('teamMask')">取消</button><button class="btn btn-primary" id="btnTeamGo">发起组队</button></div>
+  </div>
+</div>
+
+<div class="mask" id="checkMask">
+  <div class="modal">
+    <h3>完成打卡</h3><p class="msub" id="checkSub"></p>
+    <div class="fld"><label>体验评分</label><div class="stars" id="ckStars"></div></div>
+    <div class="fld"><label>一句话记录</label><textarea id="ckNote" rows="2" placeholder="值不值得来？给同学一个参考"></textarea></div>
+    <div class="m-acts"><button class="btn btn-ghost" onclick="hide_('checkMask')">取消</button><button class="btn btn-primary" id="btnCheckGo">保存打卡</button></div>
+  </div>
+</div>
+
+<div class="mask" id="shareMask">
+  <div class="modal wide">
+    <h3>分享我的攻略</h3><p class="msub">根据你的打卡足迹自动整理</p>
+    <div class="share-box" id="shareText"></div>
+    <div class="m-acts"><button class="btn btn-ghost" onclick="hide_('shareMask')">关闭</button><button class="btn btn-primary" onclick="copyShare()">复制文案</button></div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+<script>
+/* ============ 数据（示意，以西安为演示城市） ============ */
+const CATS=[{k:"all",l:"全部"},{k:"expo",l:"展览"},{k:"market",l:"市集"},{k:"show",l:"演出"},{k:"hike",l:"徒步"},{k:"food",l:"觅食"}];
+const ACTS=[
+ {id:1,t:"「长安三万里」唐文化数字沉浸展",c:"expo",cl:"展览",icon:"🏮",v:"西安美术馆 · 曲江",km:6.5,p:68,dur:"2 小时",score:94,x:36,y:30,d:"光影重构长安街市，上午人少好出片",team:3},
+ {id:2,t:"老城根 G-PARK 周末创意市集",c:"market",cl:"市集",icon:"🎪",v:"老城根 · 莲湖",km:3.2,p:0,dur:"2-3 小时",score:91,x:20,y:52,d:"手作摊位 60+，18 点后开灯最好逛",team:2},
+ {id:3,t:"城墙下 Livehouse 本地乐队联合演出",c:"show",cl:"演出",icon:"🎸",v:"101 Livehouse · 碑林",km:4.8,p:120,dur:"2.5 小时",score:86,x:52,y:58,d:"三支本地乐队轮播，预售省 30 元",team:2},
+ {id:4,t:"南五台轻徒步 · 一日往返",c:"hike",cl:"徒步",icon:"⛰️",v:"南五台 · 长安",km:32,p:60,dur:"全天",score:82,x:78,y:76,d:"台阶道为主，山顶可看秦岭云海",team:4},
+ {id:5,t:"回民街—大皮院 老城觅食漫游",c:"food",cl:"觅食",icon:"🍜",v:"回民街片区 · 莲湖",km:2.6,p:45,dur:"3 小时",score:89,x:14,y:30,d:"避开主街游客店，人均 40 吃到扶墙",team:3},
+ {id:6,t:"大唐不夜城街头演艺夜游",c:"show",cl:"夜游",icon:"🌃",v:"大唐不夜城 · 曲江",km:7.6,p:0,dur:"2.5 小时",score:88,x:64,y:26,d:"免费循环演出，21:30 后好拍照",team:1},
+];
+
+/* ============ 状态 ============ */
+const LS="wce_li…e_v1";
+let S={user:null,teams:[],checks:[]};
+try{const r=JSON.parse(localStorage.getItem(LS)||"null");if(r&&typeof r==="object"){S.user=r.user||null;S.teams=Array.isArray(r.teams)?r.teams:[];S.checks=Array.isArray(r.checks)?r.checks:[]}}catch(e){}
+const save=()=>localStorage.setItem(LS,JSON.stringify(S));
+const $=s=>document.querySelector(s);
+const act=id=>ACTS.find(a=>a.id===+id);
+
+/* ============ 工具 ============ */
+let TT;
+function toast(m){const el=$("#toast");el.textContent=m;el.classList.add("show");clearTimeout(TT);TT=setTimeout(()=>el.classList.remove("show"),2200)}
+function hide_(id){$("#"+id).classList.remove("show")}
+function show_(id){$("#"+id).classList.add("show")}
+function go(id){document.getElementById(id).scrollIntoView({behavior:"smooth"})}
+document.querySelectorAll(".mask").forEach(m=>m.addEventListener("click",e=>{if(e.target===m)m.classList.remove("show")}));
+
+/* ============ ① 地图 ============ */
+let mFilter="all";
+function renderFilters(){$("#mapFilters").innerHTML=CATS.map(c=>`<button class="fchip ${mFilter===c.k?"on":""}" data-c="${c.k}">${c.l}</button>`).join("")}
+function renderPins(){
+  $("#pins").innerHTML=ACTS.map(a=>`<div class="pin ${mFilter!=="all"&&a.c!==mFilter?"dim":""}" data-id="${a.id}" style="left:${a.x}%;top:${a.y}%"><div class="ball"><i>${a.icon}</i></div><div class="cap">${a.cl}</div></div>`).join("");
+}
+$("#mapFilters").addEventListener("click",e=>{const b=e.target.closest("[data-c]");if(!b)return;mFilter=b.dataset.c;renderFilters();renderPins();$("#mapPop").classList.remove("show")});
+$("#pins").addEventListener("click",e=>{
+  const p=e.target.closest(".pin");if(!p)return;const a=act(p.dataset.id);
+  $("#mapPop").innerHTML=`<h4>${a.icon} ${a.t}</h4><p class="mp-sub">${a.v} · ${a.km} km · ${a.p?"¥"+a.p+" /人":"免费"} · ${a.d}</p>
+    <div class="mp-acts">
+      <button class="btn btn-primary btn-sm" data-act="team" data-id="${a.id}">发起组队</button>
+      <button class="btn btn-ghost btn-sm" data-act="check" data-id="${a.id}">去打卡</button>
+      <button class="btn btn-ghost btn-sm" data-act="share">分享攻略</button>
+    </div>`;
+  $("#mapPop").classList.add("show");
+});
+$("#mapPop").addEventListener("click",e=>{const b=e.target.closest("[data-act]");if(!b)return;doAct(b.dataset.act,b.dataset.id)});
+
+/* ============ ② 活动推荐 ============ */
+function renderCards(){
+  $("#cards").innerHTML=ACTS.slice().sort((a,b)=>b.score-a.score).map(a=>`
+    <div class="card">
+      <div class="c-cover"><span class="c-tag">${a.cl}</span><span class="c-score">${a.score}</span><span>${a.icon}</span></div>
+      <div class="c-body">
+        <h3>${a.t}</h3><p class="c-sub">${a.v} · ${a.d}</p>
+        <div class="c-meta">
+          <span class="mtag t">${a.p?"¥"+a.p+" /人":"免费"}</span>
+          <span class="mtag b">${a.km} km</span>
+          <span class="mtag">${a.dur}</span>
+          <span class="mtag">${a.team} 人在组队</span>
+        </div>
+        <div class="c-acts">
+          <button class="btn btn-primary btn-sm" data-act="team" data-id="${a.id}">组队出发</button>
+          <button class="btn btn-ghost btn-sm" data-act="check" data-id="${a.id}">打卡</button>
+          <button class="btn btn-ghost btn-sm" data-act="share">攻略</button>
+        </div>
+      </div>
+    </div>`).join("");
+}
+$("#activities").addEventListener("click",e=>{const b=e.target.closest("[data-act]");if(!b)return;doAct(b.dataset.act,b.dataset.id)});
+function doAct(kind,id){if(kind==="team")return openTeam(id);if(kind==="check")return openCheck(id);if(kind==="share")return openShare()}
+
+/* ============ 登录 / 注册 ============ */
+let authMode="login";
+function openAuth(m){setMode(m==="reg"?"reg":"login");show_("authMask")}
+function setMode(m){
+  authMode=m;
+  $("#authTitle").textContent=m==="login"?"欢迎回来":"加入探索者";
+  $("#btnAuthGo").textContent=m==="login"?"登录":"注册并登录";
+  $("#nickFld").style.display=m==="reg"?"block":"none";
+  document.querySelectorAll(".tabs2 button").forEach(b=>b.classList.toggle("on",b.dataset.m===m));
+  $("#authErr").classList.remove("show");
+}
+document.querySelectorAll(".tabs2 button").forEach(b=>b.onclick=()=>setMode(b.dataset.m));
+$("#btnAuth").onclick=()=>S.user?(logout(),toast("已退出登录")):openAuth("login");
+$("#btnRegister2").onclick=()=>openAuth("reg");
+$("#btnOut").onclick=()=>{logout();toast("已退出登录")};
+$("#btnAuthGo").onclick=()=>{
+  const acc=$("#acc").value.trim(),pwd=$("#pwd").value.trim();
+  if(!acc||pwd.length<4)return authErr("请填写账号，密码至少 4 位");
+  if(authMode==="reg"&&!$("#nick").value.trim())return authErr("注册请填写昵称");
+  S.user={acc,nick:authMode==="reg"?$("#nick").value.trim():acc.replace(/@.*$/,"").slice(0,8)};
+  save();hide_("authMask");syncUser();toast(`欢迎，${S.user.nick} 🎉`);
+};
+function authErr(m){const e=$("#authErr");e.textContent=m;e.classList.add("show")}
+function demoLogin(){S.user={acc:"demo",nick:"演示探索者"};save();hide_("authMask");syncUser();toast("已用体验账号登录 🎉")}
+function logout(){S.user=null;save();syncUser()}
+function syncUser(){
+  const on=!!S.user;
+  $("#userChip").classList.toggle("show",on);
+  $("#btnOut").style.display=on?"inline-block":"none";
+  $("#btnAuth").style.display=on?"none":"inline-block";
+  if(on){$("#userName").textContent=S.user.nick;$("#userAvatar").textContent=S.user.nick.slice(0,1).toUpperCase()}
+  $("#recLock").style.display=on?"none":"block";
+  $("#recBody").style.display=on?"block":"none";
+  if(on)renderRec(curTab);
+}
+function guard(){if(S.user)return true;toast("请先登录 / 注册");openAuth("login");return false}
+
+/* ============ 发起组队 ============ */
+let teamId=null;
+function openTeam(id){
+  if(!guard())return;const a=act(id);teamId=a.id;
+  $("#teamSub").textContent=`${a.icon} ${a.t}`;
+  $("#tTime").value=a.c==="hike"?"周日 07:30 北门集合":"周六 14:00 门口集合";
+  $("#tMsg").value="";show_("teamMask");
+}
+$("#btnTeamGo").onclick=()=>{
+  S.teams.unshift({actId:teamId,time:$("#tTime").value.trim()||"时间待定",num:$("#tNum").value,msg:$("#tMsg").value.trim()||"找个搭子一起",joined:1});
+  save();hide_("teamMask");setTab("team");renderRec("team");go("records");toast("队伍已发起，等待小伙伴加入");
+};
+
+/* ============ 打卡 ============ */
+let ckId=null,ckStar=5;
+function openCheck(id){
+  if(!guard())return;const a=act(id);ckId=a.id;ckStar=5;
+  $("#checkSub").textContent=`${a.icon} ${a.t}`;
+  $("#ckNote").value="";renderStars();show_("checkMask");
+}
+function renderStars(){$("#ckStars").innerHTML=[1,2,3,4,5].map(i=>`<button class="${i<=ckStar?"on":""}" data-s="${i}">★</button>`).join("")}
+$("#ckStars").addEventListener("click",e=>{const b=e.target.closest("[data-s]");if(!b)return;ckStar=+b.dataset.s;renderStars()});
+$("#btnCheckGo").onclick=()=>{
+  const d=new Date();
+  S.checks.unshift({actId:ckId,star:ckStar,note:$("#ckNote").value.trim()||"打卡成功",date:`${d.getMonth()+1}月${d.getDate()}日`});
+  save();hide_("checkMask");setTab("check");renderRec("check");go("records");toast("打卡成功，足迹 +1 📍");
+};
+
+/* ============ 我的记录 ============ */
+let curTab="team";
+function setTab(t){curTab=t;document.querySelectorAll(".rec-tab").forEach(b=>b.classList.toggle("on",b.dataset.tab===t))}
+$("#recTabs").addEventListener("click",e=>{const b=e.target.closest("[data-tab]");if(!b)return;setTab(b.dataset.tab);renderRec(b.dataset.tab)});
+function renderRec(t){
+  if(!S.user)return;const box=$("#recList");
+  const empty=m=>`<div class="lock"><p>${m}</p><button class="btn btn-primary" onclick="go('activities')">去看看活动</button></div>`;
+  if(t==="team"){
+    box.innerHTML=S.teams.length?S.teams.map((x,i)=>{const a=act(x.actId);if(!a)return"";
+      return `<div class="rec"><div class="ri">${a.icon}</div><div class="rm"><b>${a.t}</b><span>${x.time} · ${x.num} · ${x.msg}</span></div><div class="rs">${x.joined}/4 人<a data-cancel="${i}">取消</a></div></div>`}).join(""):empty("还没有队伍，去活动卡片点「组队出发」");
+  }else if(t==="check"){
+    box.innerHTML=S.checks.length?S.checks.map(x=>{const a=act(x.actId);if(!a)return"";
+      return `<div class="rec"><div class="ri">${a.icon}</div><div class="rm"><b>${a.t}</b><span>${x.date} · ${"★".repeat(x.star)}${"☆".repeat(5-x.star)} · ${x.note}</span></div><div class="rs">已打卡</div></div>`}).join(""):empty("还没有打卡记录，挑一个周末出发吧");
+  }else{
+    box.innerHTML=`<div class="rec"><div class="ri">📖</div><div class="rm"><b>我的周末攻略</b><span>由 ${S.checks.length} 条打卡足迹自动整理</span></div><div class="rs"><a onclick="openShare()">生成并分享 →</a></div></div>`;
+  }
+}
+$("#recList").addEventListener("click",e=>{const c=e.target.closest("[data-cancel]");if(!c)return;S.teams.splice(+c.dataset.cancel,1);save();renderRec("team");toast("已取消该队伍")});
+
+/* ============ 攻略分享 ============ */
+function openShare(){
+  if(!guard())return;
+  if(!S.checks.length){toast("先完成一次打卡，才能生成攻略");setTab("check");renderRec("check");return}
+  const lines=["🧭 我的周末城市探索攻略","","足迹："];
+  S.checks.slice().reverse().forEach((x,i)=>{const a=act(x.actId);if(!a)return;
+    lines.push(`${i+1}. ${a.t}（${a.v}）`,`   ${"★".repeat(x.star)} ${x.date} · ${x.note}`)});
+  const total=S.checks.reduce((s,x)=>{const a=act(x.actId);return s+(a?a.p:0)},0);
+  lines.push("",`累计花费约 ¥${total} · 来自「周末城市探索指南」`);
+  $("#shareText").textContent=lines.join("\n");show_("shareMask");
+}
+function copyShare(){
+  const tx=$("#shareText").textContent;
+  const ok=()=>toast("攻略文案已复制，去粘贴分享吧");
+  const fallback=()=>{const ta=document.createElement("textarea");ta.value=tx;document.body.appendChild(ta);ta.select();
+    try{document.execCommand("copy");ok()}catch(e){toast("复制失败，请手动选择文本")}ta.remove()};
+  if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(tx).then(ok).catch(fallback)}else fallback();
+}
+
+/* ============ 启动 ============ */
+renderFilters();renderPins();renderCards();syncUser();
+
+</script>
+</body>
+</html>
